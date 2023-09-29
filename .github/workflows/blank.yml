@@ -13,16 +13,33 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Set up Node.js environment
+        run: npm install
+
       - name: Get PR Creator
         id: pr_creator
-        run: echo "::set-output name=username::${{ github.event.pull_request.user.login }}"
-
-      - name: Log PR Creator
         run: |
-          username="${{ steps.pr_creator.outputs.username }}"
+          echo "::set-output name=username::${{ github.event.pull_request.user.login }}"
+          username="${{ github.event.pull_request.user.login }}"
           echo "PR Creator: $username"
 
       - name: Comment on PR
         run: |
-          username="${{ steps.pr_creator.outputs.username }}"
-          echo "Hello, @$username! Thank you for creating this pull request. 🚀 We appreciate your contribution to this repository. Our team will review your changes soon. If you have any questions or need further assistance, please feel free to ask. Keep up the good work! 👍"
+          const username = process.env.PR_CREATOR_USERNAME;
+          const body = `Hello, @${username}! Thank you for creating this pull request. 🚀 We appreciate your contribution to this repository. Our team will review your changes soon. If you have any questions or need further assistance, please feel free to ask. Keep up the good work! 👍`;
+
+          echo "$body" > comment.txt
+          cat comment.txt
+
+          # Use GitHub API to post the comment
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"body\": \"$body\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+          echo "Commented on PR by @$username: $body"
