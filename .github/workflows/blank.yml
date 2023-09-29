@@ -1,45 +1,22 @@
-name: Comment on Pull Request
-
+name: Comment on PR Creation
 on:
-  pull_request:
-    types:
-      - opened
+    pull_request_target:
+        types:
+            - opened
 
 jobs:
   comment:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-
-      - name: Set up Node.js environment
-        run: npm install
-
-      - name: Get PR Creator
-        id: pr_creator
-        run: |
-          echo "::set-output name=username::${{ github.event.pull_request.user.login }}"
-          username="${{ github.event.pull_request.user.login }}"
-          echo "PR Creator: $username"
-
       - name: Comment on PR
-        run: |
-          const username = process.env.PR_CREATOR_USERNAME;
-          const body = `Hello, @${username}! Thank you for creating this pull request. 🚀 We appreciate your contribution to this repository. Our team will review your changes soon. If you have any questions or need further assistance, please feel free to ask. Keep up the good work! 👍`;
-
-          echo "$body" > comment.txt
-          cat comment.txt
-
-          # Use GitHub API to post the comment
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"body\": \"$body\"}" \
-            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
-          echo "Commented on PR by @$username: $body"
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          script: |
+            const { owner, repo, number } = context.issue;
+            const commentAuthor = context.payload.sender.login;
+            const commentBody = `Thank you @${commentAuthor} ,for creating the PR and contributing to our GameZone 💗 \n Review team will review the PR and will reach out to you soon! 😇 \n Make sure that you have marked all the tasks that you are done with ✅. \n Thank you for your patience! 😀	
+            `;
+            await github.issues.createComment({ owner, repo, issue_number: number, body: commentBody });
+            console.log(`Commented on the PR: ${commentBody}.`);
