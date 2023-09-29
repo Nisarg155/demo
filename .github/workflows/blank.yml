@@ -18,5 +18,5 @@ jobs:
             const { owner, repo, number } = context.issue;
             const author = context.payload.sender.login; // Use 'sender.login' to get the PR author's login.
             const body = `Hello! 👋 Thank you @${author} for your pull request! \n We appreciate your contribution to "Frontend-Treasure" for Hacktoberfest. Your effort helps make our project better. 🌟 \nOur team will review your PR soon. In the meantime, feel free to explore more ways to contribute or join our community discussions. Your involvement is important to us! \n Keep up the great work! 🚀`;
-            await github.issues.createComment({ owner, repo, issue_number: number, body: body });
+            await context.github.issues.createComment({ owner, repo, issue_number: number, body: body });
             console.log(`Commented on PR of user @${author}`);
