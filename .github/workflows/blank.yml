@@ -16,7 +16,7 @@ jobs:
           script: |
             const { owner, repo, number } = context.issue;
             const commentAuthor = context.payload.sender.login;
-            const commentBody = `Thank you @${commentAuthor} ,for creating the PR and contributing to our GameZone 💗 \n Review team will review the PR and will reach out to you soon! 😇 \n Make sure that you have marked all the tasks that you are done with ✅. \n Thank you for your patience! 😀	
-            `;
+            const body = `Hello! 👋 Thank you @${author} for your pull request! \n We appreciate your contribution to "Frontend-Treasure" for Hacktoberfest. Your effort helps make our project better. 🌟 \nOur team will review your PR soon. In the meantime, feel free to explore more ways to contribute or join our community discussions. Your involvement is important to us! \n Keep up the great work! 🚀`;
+          
             await github.issues.createComment({ owner, repo, issue_number: number, body: commentBody });
             console.log(`Commented on the PR: ${commentBody}.`);
